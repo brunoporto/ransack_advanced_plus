@@ -30,7 +30,8 @@ module RansackAdvancedPlus
         @builder = @f
       end
 
-      fields = @builder.send("#{type}_fields", @builder.object.send("build_#{type}"), child_index: Time.now.to_i) do |ff|
+      new_id = DateTime.now.strftime('%s')
+      fields = @builder.send("#{type}_fields", @builder.object.send("build_#{type}"), child_index: new_id) do |ff|
         render_to_string partial: 'ransack_advanced_plus/' + type.to_s + "_fields", locals: {frm: ff}
       end
 

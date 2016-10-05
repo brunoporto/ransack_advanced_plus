@@ -4,7 +4,7 @@ module RansackAdvancedPlusHelper
     @ransack_object = object
     @ransack_object.build_grouping unless @ransack_object.groupings.any?
     @rap_model_name = @ransack_object.context.klass.name.tableize
-    render 'ransack_advanced_plus/advanced_search', search_url: url, redirect_path: url
+    render partial: 'ransack_advanced_plus/advanced_search', locals: {search_url: url, redirect_path: url}
   end
 
   # def setup_search_form(builder, search_object)

@@ -34,28 +34,3 @@
     </div>
   </div>
 </div>
-
-<script>
-  $(document).on('click','.ransack_advanced_plus_add_button',function(ev){
-    ev.preventDefault();
-
-    var $el = $(this);
-    var model_name = $el.attr('data-model-name');
-    var model_type = $el.attr('data-model-type');
-    var group_index = $el.attr('data-group-index');
-    var condition_index = $el.attr('data-condition-index');
-
-    $.ajax({
-      url: '/ransack_advanced_plus/form_builder/'+model_name,
-      data: {type: model_type, group_index: group_index, condition_index: condition_index},
-      method: 'get',
-      success: function(data){
-        $el.parent().append(data);
-      },
-      error: function(error){
-
-      }
-    });
-
-  });
-</script>

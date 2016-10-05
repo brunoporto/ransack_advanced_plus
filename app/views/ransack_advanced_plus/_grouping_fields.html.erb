@@ -4,14 +4,14 @@
       <%= t('ransack.advanced_search.condition_group.match') %>
       <%= frm.combinator_select({}, {class: 'form-control input-sm'}) %>
       <%= t('ransack.advanced_search.condition_group.match_condition') %>
-      <%= link_to 'Remover', nil %>
+      <%= link_to 'Remover', nil, class: 'ransack_advanced_plus_remove_button' %>
     </span>
 
     <%= frm.condition_fields do |c| %>
         <%= render partial: 'ransack_advanced_plus/condition_fields', locals: {frm: c} %>
     <% end %>
 
-    <% group_index = frm.object_name[/\d/] %>
+    <% group_index = frm.object_name.scan(/\d+/).first %>
     <a href="" data-model-name="<%= @rap_model_name %>" data-group-index="<%= group_index %>" data-model-type="condition" class="ransack_advanced_plus_add_button">Adicionar Condição</a>
 
     <%= frm.grouping_fields do |g| %>
