@@ -6,10 +6,11 @@ $(document).on('click','.ransack_advanced_plus_add_button',function(ev){
     var model_type = $el.attr('data-model-type');
     var group_index = $el.attr('data-group-index');
     var condition_index = $el.attr('data-condition-index');
+    var associations_name = $el.closest('form').attr('data-associations');
 
     $.ajax({
         url: '/ransack_advanced_plus/form_builder/'+model_name,
-        data: {type: model_type, group_index: group_index, condition_index: condition_index},
+        data: {type: model_type, group_index: group_index, condition_index: condition_index, associations: associations_name},
         method: 'get',
         success: function(data){
             $el.before(data);
