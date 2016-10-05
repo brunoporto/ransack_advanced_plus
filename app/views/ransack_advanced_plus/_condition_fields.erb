@@ -1,0 +1,20 @@
+<%= content_tag :div, {
+  class: 'fields condition ransack-condition-field', 'data-object-name' => frm.object_name
+  } do %>
+
+  <%= content_tag(:span, button_to_remove_fields, {}, false) %>
+
+  <%= frm.attribute_fields do |a| %>
+    <%= render partial: 'ransack_advanced_plus/attribute_fields', locals: {frm: a} %>
+  <% end %>
+
+  <%= frm.predicate_select({}, {class: 'form-control input-sm'}) %>
+
+  <%= frm.value_fields do |v| %>
+    <%= render partial: 'ransack_advanced_plus/value_fields', locals: {frm: v} %>
+  <% end %>
+
+    <a href="" data-model-name="cliente_servico" data-model-type="value" class="ransack_advanced_plus_add_button">Adicionar Valor</a>
+  <% #button_to_add_fields '', frm, :value, 'ransack-add-attribute' %>
+
+<% end %>

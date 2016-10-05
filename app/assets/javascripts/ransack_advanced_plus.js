@@ -1,0 +1,82 @@
+$(document).ready(function(){
+
+    $('select.ransack-attribute-select').each(function(e) {
+        fieldName = $(this).find('option:selected')[0].value;
+        search.changeValueInputsType(this, fieldName, search);
+    });
+
+});
+
+$(document).on("click", "i.add_fields", function() {
+    search.add_fields(this, $(this).data('fieldType'), $(this).data('content'));
+    if($(this).hasClass('ransack-add-attribute')) {
+        fieldName = $(this).parents('.ransack-condition-field').find('select.ransack-attribute-select').find('option:selected')[0].value;
+        search.changeValueInputsType(this, fieldName, search);
+    }
+    return false;
+});
+$(document).on('change', 'select.ransack-attribute-select', function(e) {
+    fieldName = $(this).find('option:selected')[0].value;
+    search.changeValueInputsType(this, fieldName, search);
+});
+$(document).on("click", "i.remove_fields", function() {
+    search.remove_fields(this);
+    return false;
+});
+$(document).on("click", "button.nest_fields", function() {
+    search.nest_fields(this, $(this).data('fieldType'));
+    return false;
+});
+
+
+
+(function() {
+  this.Search = (function() {
+    function Search(templates) {
+      this.templates = templates != null ? templates : {};
+    }
+
+    Search.prototype.remove_fields = function(button) {
+      return $(button).closest('.fields').remove();
+    };
+
+    Search.prototype.add_fields = function(button, type, content) {
+      var new_id, regexp;
+      new_id = new Date().getTime();
+      regexp = new RegExp('new_' + type, 'g');
+      return $(button).before(content.replace(regexp, new_id));
+    };
+
+    Search.prototype.nest_fields = function(button, type) {
+      var id_regexp, new_id, object_name, sanitized_object_name, template;
+      new_id = new Date().getTime();
+      id_regexp = new RegExp('new_' + type, 'g');
+      template = this.templates[type];
+      object_name = $(button).closest('.fields').attr('data-object-name');
+      sanitized_object_name = object_name.replace(/\]\[|[^-a-zA-Z0-9:.]/g, '_').replace(/_$/, '');
+      template = template.replace(/new_object_name\[/g, object_name + "[");
+      template = template.replace(/new_object_name_/, sanitized_object_name + '_');
+      return $(button).before(template.replace(id_regexp, new_id));
+    };
+
+    Search.prototype.convertFieldType = function (fieldType) {
+      var fieldTypeToHtmlType = {
+        'default': 'text',
+        'integer': 'number',
+        'date' : 'date',
+        'datetime' : 'date'
+      };
+      return (fieldTypeToHtmlType[fieldType] || fieldTypeToHtmlType['default']);
+    };
+
+    Search.prototype.changeValueInputsType = function(element, fieldName, search) {
+      fieldType = search.fieldsType[fieldName];
+      conditionValueInputs = $(element).parents('.ransack-condition-field').find('.ransack-attribute-value');
+      conditionValueInputs.attr('type', search.convertFieldType(fieldType));
+    };
+
+    return Search;
+
+  })();
+
+}).call(this);
