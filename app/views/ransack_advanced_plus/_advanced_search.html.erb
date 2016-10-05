@@ -1,11 +1,8 @@
 <div class="ransack-advanced-search">
 
   <div class="row">
-    <div class="col-md-4">
-      <%= render 'ransack_advanced_plus/saved_searches_list', redirect_path: redirect_path %>
-    </div>
-    <div class="col-md-8">
-      <%= search_form_for(@search, url: search_url, html: { method: :post, class: 'form-inline', role: 'form'  }) do |frm| %>
+    <div class="col-md-12">
+      <%= search_form_for(@ransack_object, url: search_url, html: { method: :post, class: 'form-inline', role: 'form'  }) do |frm| %>
 
         <div class="form-group">
           <%= label_tag 'Descrição da Busca (necessária para salvar a busca)' %>
@@ -18,11 +15,10 @@
 
         <h4><%= t('ransack.advanced_search.condition_group.title') %></h4>
         <div class="form-group">
-          <%= debug (frm.grouping_fields) %>
           <%= frm.grouping_fields do |g| %>
               <%= render partial: 'ransack_advanced_plus/grouping_fields', locals: {frm: g} %>
           <% end %>
-          <a href="" data-model-name="cliente_servico" data-model-type="grouping" class="ransack_advanced_plus_add_button">Adicionar Grupo</a>
+          <a href="" data-model-name="<%= @rap_model_name %>" data-model-type="grouping" class="ransack_advanced_plus_add_button">Adicionar Grupo</a>
         </div>
 
         <!-- <%= label_tag :distinct, 'Return distinct records?' %> -->
@@ -46,10 +42,12 @@
     var $el = $(this);
     var model_name = $el.attr('data-model-name');
     var model_type = $el.attr('data-model-type');
+    var group_index = $el.attr('data-group-index');
+    var condition_index = $el.attr('data-condition-index');
 
     $.ajax({
       url: '/ransack_advanced_plus/form_builder/'+model_name,
-      data: {type: model_type},
+      data: {type: model_type, group_index: group_index, condition_index: condition_index},
       method: 'get',
       success: function(data){
         $el.parent().append(data);

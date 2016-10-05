@@ -3,30 +3,34 @@ module RansackAdvancedPlus
     def index
       type = params[:type] || 'grouping'
       klass = params[:model].classify.constantize
-      @search = klass.send :ransack
+      @ransack_object = klass.send :ransack
+      @rap_model_name = @ransack_object.context.klass.name.tableize
 
-      child_index = params[:child_index] || Time.now.to_i
+      group_index = params[:group_index]
+      condition_index = params[:condition_index]
 
-      form = self.view_context.search_form_for(@search){|frm| @f = frm}
+      form = self.view_context.search_form_for(@ransack_object){|frm| @f = frm}
       if type=='condition'
         if @f.grouping_fields.present?
-          @f = @f.grouping_fields
+          @builder = @f.grouping_fields
         else
-          @f.send("grouping_fields", @f.object.send("build_grouping"), child_index: "new_grouping"){|g| @g=g}
-          @f = @g
+          @f.send("grouping_fields", @f.object.send("build_grouping"), child_index: group_index){|g| @g=g}
+          @builder = @g
         end
       elsif type=='value'
         if @f.condition_fields.present?
-          @f = @f.condition_fields
+          @builder = @f.condition_fields
         else
-          @f.send("condition_fields", @f.object.send("build_condition"), child_index: "new_condition"){|c| @c=c}
-          @f = @c
+          @f.send("grouping_fields", @f.object.send("build_grouping"), child_index: group_index){|g| @g=g}
+          @g.send("condition_fields", @g.object.send("build_condition"), child_index: condition_index){|c| @c=c}
+          @builder = @c
+
         end
+      else
+        @builder = @f
       end
 
-      new_object = @f.object.send "build_#{type}"
-      fields = @f.send("#{type}_fields", new_object, child_index: child_index) do |ff|
-        @ff = ff
+      fields = @builder.send("#{type}_fields", @builder.object.send("build_#{type}"), child_index: Time.now.to_i) do |ff|
         render_to_string partial: 'ransack_advanced_plus/' + type.to_s + "_fields", locals: {frm: ff}
       end
 
