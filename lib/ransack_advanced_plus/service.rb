@@ -15,21 +15,6 @@ module RansackAdvancedPlus
       @view_context.search_form_for(@ransack_object){|frm| @form = frm}
     end
 
-    def build_form_html(caller)
-      build_form_context(caller.view_context)
-      params = @view_context.request.parameters
-      type = params[:type] || 'grouping'
-      group_index = params[:group_index]
-      condition_index = params[:condition_index]
-      html=nil
-      builder = builder_by_type(type, group_index, condition_index)
-      new_id = DateTime.now.strftime('%s')
-      builder.send("#{type}_fields", builder.object.send("build_#{type}"), child_index: new_id) do |ff|
-        html = caller.render_to_string(partial: 'ransack_advanced_plus/' + type.to_s + "_fields", locals: {frm: ff})
-      end
-      html
-    end
-
     #REQUIRE CALL build_form_context BEFORE USE THIS
     def builder_by_type(type, group_index=0, condition_index=0)
       if type=='condition'
@@ -90,7 +75,7 @@ module RansackAdvancedPlus
     def operators_by_type(type)
       case type.to_sym
         when :string
-          [:eq, :not_eq, :matches, :does_not_match]
+          [:eq, :not_eq, :cont, :matches, :does_not_match]
         when :integer, :float
           [:eq, :not_eq, :lt, :lteq, :gt, :gteq, :in, :not_in]
         when :date, :time, :datetime

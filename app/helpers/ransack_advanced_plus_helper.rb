@@ -10,7 +10,7 @@ module RansackAdvancedPlusHelper
     @rap_associations = @ransack_object.klass.ransackable_associations
     @rap_attributes = []
     @rap_values = {}
-    @rap_operators = {}
+    @rap_operators = {default: 'eq'}
 
     if arguments.present?
       #ASSOCIATIONS
