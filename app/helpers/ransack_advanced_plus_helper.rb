@@ -10,13 +10,14 @@ module RansackAdvancedPlusHelper
     @rap_associations = @ransack_object.klass.ransackable_associations
     @rap_attributes = []
     @rap_values = {}
+    @rap_operators = {}
 
     if arguments.present?
       #ASSOCIATIONS
       if arguments[:associations].present?
         if arguments[:associations].is_a?(Hash)
           @rap_associations =  arguments[:associations].keys.reject{|k| @rap_model_name==k}
-          @rap_attributes = arguments[:associations].map{|k, attrs| attrs.map{|a| "#{k}_#{a}"} }
+          @rap_attributes = arguments[:associations].map{|k, attrs| attrs.map{|a| "#{k}_#{a}"} }.flatten
         else
           @rap_associations =  arguments[:associations]
         end

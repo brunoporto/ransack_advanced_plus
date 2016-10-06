@@ -2,7 +2,7 @@
 
   <div class="row">
     <div class="col-md-12">
-      <%= search_form_for(@ransack_object, url: search_url, html: { method: :post, class: 'form-inline', role: 'form', data: {rap_attributes: @rap_attributes.join(','), rap_associations: @rap_associations.join(',')}}) do |frm| %>
+      <%= search_form_for(@ransack_object, url: search_url, html: { method: :post, class: 'form-inline ransack-form', role: 'form', data: {rap_model: @rap_model_name, rap_attributes: @rap_attributes.join(','), rap_associations: @rap_associations.join(',')}}) do |frm| %>
 
         <div class="form-group">
           <%= label_tag 'Descrição da Busca (necessária para salvar a busca)' %>
@@ -18,7 +18,7 @@
           <%= frm.grouping_fields do |g| %>
               <%= render partial: 'ransack_advanced_plus/grouping_fields', locals: {frm: g} %>
           <% end %>
-          <a href="" data-model-name="<%= @rap_model_name %>" data-model-type="grouping" class="ransack_advanced_plus_add_button">Adicionar Grupo</a>
+          <a href="" data-rap-type="grouping" class="ransack_advanced_plus_add_button">Adicionar Grupo</a>
         </div>
 
         <!-- <%= label_tag :distinct, 'Return distinct records?' %> -->

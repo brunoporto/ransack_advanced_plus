@@ -1,18 +1,18 @@
-<div class="fields condition ransack-condition-field" data-object-name="<%= frm.object_name %>">
+<div class="fields condition ransack-condition-fields" data-object-name="<%= frm.object_name %>">
   <%= link_to 'Remover', nil, class: 'ransack_advanced_plus_remove_button' %>
 
   <%= frm.attribute_fields do |a| %>
-    <% render partial: 'ransack_advanced_plus/attribute_fields', locals: {frm: a} %>
+    <%= render partial: 'ransack_advanced_plus/attribute_fields', locals: {frm: a} %>
   <% end %>
 
-  <%= frm.predicate_select({}, {class: 'form-control input-sm'}) %>
+  <%= render partial: 'ransack_advanced_plus/predicates', locals: {frm: frm} %>
 
   <%= frm.value_fields do |v| %>
     <%= render partial: 'ransack_advanced_plus/value_fields', locals: {frm: v} %>
   <% end %>
   <% group_index = frm.object_name.scan(/\d+/).first %>
   <% condition_index = frm.object_name.scan(/\d+/).last %>
-  <a href="" data-model-name="<%= @rap_model_name %>" data-group-index="<%= group_index %>" data-condition-index="<%= condition_index %>" data-model-type="value" class="ransack_advanced_plus_add_button">Adicionar Valor</a>
+  <a href="" data-rap-group-index="<%= group_index %>" data-rap-condition-index="<%= condition_index %>" data-rap-type="value" class="ransack_advanced_plus_add_button">Adicionar Valor</a>
 
 
 

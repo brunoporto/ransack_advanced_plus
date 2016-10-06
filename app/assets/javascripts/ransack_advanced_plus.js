@@ -1,10 +1,11 @@
 
-function filter_attributes_to_show(element) {
-    var $form = $(element).closest('form[data-rap-attributes]');
+function filterAttributes(element) {
+    var $form = getFormElement(element);
+    console.log($form.attr('data-rap-attributes'));
     var attributes_to_show = $form.attr('data-rap-attributes').split(',').filter(Boolean);
-    var object_name = $form.attr('data-rap-object');
+    var model_name = $form.attr('data-rap-model');
     $('select.ransack-attribute-select option').each(function(i,o) {
-        if (attributes_to_show.length > 0 && $.inArray($(o).val(), attributes_to_show) === -1 && $.inArray(object_name+"_"+$(o).val(), attributes_to_show) === -1) {
+        if (attributes_to_show.length > 0 && $(o).val()!="" && $.inArray($(o).val(), attributes_to_show) === -1 && $.inArray(model_name+"_"+$(o).val(), attributes_to_show) === -1) {
             var $parent = $(o).parent();
             if ($parent.prop("tagName")=='OPTGROUP' && $parent.children().length==1) {
                 $(o).parent().remove();
@@ -15,15 +16,47 @@ function filter_attributes_to_show(element) {
     });
 }
 
+function getFormElement(element) {
+    return $(element).closest('.ransack-form');
+}
+
+function getPredicateElement(element) {
+    return $(element).closest('.ransack-condition-fields').find('.ransack-predicate-select');
+}
+
+$(document).on('change','.ransack-attribute-select', function(ev) {
+    var $el = $(this);
+    var $form = getFormElement(this);
+    var model_name = $form.attr('data-rap-model');
+    var attribute = $el.val();
+
+    $.ajax({
+        url: '/ransack_advanced_plus/operators/'+model_name+'/'+attribute,
+        method: 'get',
+        success: function(data){
+            var $precicateEl = getPredicateElement($el);
+            var current_value = $precicateEl.val();
+            $precicateEl.on('change',function(){
+                console.log('mudou');
+            });
+            $precicateEl.html($(data).html()).val(current_value);
+
+        },
+        error: function(error){
+
+        }
+    });
+});
 
 $(document).on('click','.ransack_advanced_plus_add_button',function(ev){
     ev.preventDefault();
 
     var $el = $(this);
-    var model_name = $el.attr('data-model-name');
-    var model_type = $el.attr('data-model-type');
-    var group_index = $el.attr('data-group-index');
-    var condition_index = $el.attr('data-condition-index');
+    var $form = getFormElement(this);
+    var model_name = $form.attr('data-rap-model');
+    var model_type = $el.attr('data-rap-type');
+    var group_index = $el.attr('data-rap-group-index');
+    var condition_index = $el.attr('data-rap-condition-index');
     var associations = $el.closest('form').attr('data-rap-associations');
     var attributes = $el.closest('form').attr('data-rap-attributes');
 
@@ -33,7 +66,7 @@ $(document).on('click','.ransack_advanced_plus_add_button',function(ev){
         method: 'get',
         success: function(data){
             $el.before(data);
-            filter_attributes_to_show($el);
+            filterAttributes($el);
         },
         error: function(error){
 
@@ -41,8 +74,6 @@ $(document).on('click','.ransack_advanced_plus_add_button',function(ev){
     });
 
 });
-
-
 
 $(document).on('click','.ransack_advanced_plus_remove_button',function(ev){
     ev.preventDefault();
@@ -64,7 +95,7 @@ $(document).on('click','.ransack_advanced_plus_remove_button',function(ev){
 // $(document).on("click", "i.add_fields", function() {
 //     search.add_fields(this, $(this).data('fieldType'), $(this).data('content'));
 //     if($(this).hasClass('ransack-add-attribute')) {
-//         fieldName = $(this).parents('.ransack-condition-field').find('select.ransack-attribute-select').find('option:selected')[0].value;
+//         fieldName = $(this).parents('.ransack-condition-fields').find('select.ransack-attribute-select').find('option:selected')[0].value;
 //         search.changeValueInputsType(this, fieldName, search);
 //     }
 //     return false;
@@ -125,7 +156,7 @@ $(document).on('click','.ransack_advanced_plus_remove_button',function(ev){
 //
 //     Search.prototype.changeValueInputsType = function(element, fieldName, search) {
 //       fieldType = search.fieldsType[fieldName];
-//       conditionValueInputs = $(element).parents('.ransack-condition-field').find('.ransack-attribute-value');
+//       conditionValueInputs = $(element).parents('.ransack-condition-fields').find('.ransack-attribute-value');
 //       conditionValueInputs.attr('type', search.convertFieldType(fieldType));
 //     };
 //

@@ -3,6 +3,7 @@ require 'ransack'
 
 require 'ransack_advanced_plus/engine'
 require 'ransack_advanced_plus/version'
+require 'ransack_advanced_plus/service'
 require 'ransack_advanced_plus/helpers/configuration'
 
 module RansackAdvancedPlus

@@ -12,7 +12,7 @@
     <% end %>
 
     <% group_index = frm.object_name.scan(/\d+/).first %>
-    <a href="" data-model-name="<%= @rap_model_name %>" data-group-index="<%= group_index %>" data-model-type="condition" class="ransack_advanced_plus_add_button">Adicionar Condição</a>
+    <a href="" data-rap-group-index="<%= group_index %>" data-rap-type="condition" class="ransack_advanced_plus_add_button">Adicionar Condição</a>
 
     <%= frm.grouping_fields do |g| %>
         <%= render partial: 'ransack_advanced_plus/grouping_fields', locals: {frm: g} %>
