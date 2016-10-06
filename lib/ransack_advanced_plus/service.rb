@@ -18,16 +18,16 @@ module RansackAdvancedPlus
     #REQUIRE CALL build_form_context BEFORE USE THIS
     def builder_by_type(type, group_index=0, condition_index=0)
       if type=='condition'
-        builder_condition(group_index)
+        builder_grouping(group_index)
       elsif type=='value'
-        builder_value(group_index, condition_index)
+        builder_condition(group_index, condition_index)
       else
         @form
       end
     end
 
     #REQUIRE CALL build_form_context BEFORE USE THIS
-    def builder_condition(group_index=0)
+    def builder_grouping(group_index=0)
       if @form.grouping_fields.present?
         @form.grouping_fields
       else
@@ -37,7 +37,7 @@ module RansackAdvancedPlus
     end
 
     #REQUIRE CALL build_form_context BEFORE USE THIS
-    def builder_value(group_index=0, condition_index=0)
+    def builder_condition(group_index=0, condition_index=0)
       if @form.condition_fields.present?
         @form.condition_fields
       else
@@ -62,8 +62,7 @@ module RansackAdvancedPlus
     end
 
     def attribute_operators(attribute)
-      attr = self.attributes(attribute)
-      operators_by_type(attr.values.first)
+      operators_by_type(attributes(attribute).values.first)
     end
 
     def operators_by_type(type)

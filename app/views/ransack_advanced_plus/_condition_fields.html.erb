@@ -1,20 +1,24 @@
-<div class="fields condition ransack-condition-fields" data-object-name="<%= frm.object_name %>">
+<% group_index = frm.object_name.scan(/\d+/).first %>
+<% condition_index = frm.object_name.scan(/\d+/).last %>
+<div class="fields condition ransack-condition-fields" data-object-name="<%= frm.object_name %>" data-rap-group-index="<%= group_index %>" data-rap-condition-index="<%= condition_index %>">
   <%= render 'ransack_advanced_plus/remove_button' %>
 
-  <%= frm.attribute_fields do |a| %>
-    <%= render partial: 'ransack_advanced_plus/attribute_fields', locals: {frm: a} %>
-  <% end %>
+  <span class="ransack-attribute-fields">
+    <%= frm.attribute_fields do |a| %>
+      <%= render partial: 'ransack_advanced_plus/attribute_fields', locals: {frm: a} %>
+    <% end %>
+  </span>
 
-  <%= render partial: 'ransack_advanced_plus/predicates', locals: {frm: frm} %>
+  <span class="ransack-predicate-fields">
+    <%= render partial: 'ransack_advanced_plus/predicates', locals: {frm: frm} %>
+  </span>
 
-  <%= frm.value_fields do |v| %>
-    <%= render partial: 'ransack_advanced_plus/value_fields', locals: {frm: v, frm_condition: frm} %>
-  <% end %>
-  <% group_index = frm.object_name.scan(/\d+/).first %>
-  <% condition_index = frm.object_name.scan(/\d+/).last %>
-  <a href="" data-rap-group-index="<%= group_index %>" data-rap-condition-index="<%= condition_index %>" data-rap-type="value" class="ransack_advanced_plus_add_button">Valor</a>
+  <span class="ransack-value-fields">
+    <%= frm.value_fields do |v| %>
+      <%= render partial: 'ransack_advanced_plus/value_fields', locals: {frm: v, frm_condition: frm} %>
+    <% end %>
+  </span>
 
-
-
+  <a href="" data-rap-type="value" class="ransack_advanced_plus_add_button">Valor</a>
 
 </div>

@@ -22,10 +22,11 @@ function loadAttributes(element) {
     var $el = $(element);
     var $form = getFormElement($el);
     var model_name = $form.attr('data-rap-model');
+    var associations = $form.attr('data-rap-associations');
+    var $conditionFields = getConditionFields(element);
+    var group_index = $conditionFields.attr('data-rap-group-index');
+    var condition_index = $conditionFields.attr('data-rap-condition-index');
     var model_type = $el.attr('data-rap-type');
-    var group_index = $el.attr('data-rap-group-index');
-    var condition_index = $el.attr('data-rap-condition-index');
-    var associations = $el.closest('form').attr('data-rap-associations');
     // var attributes = $el.closest('form').attr('data-rap-attributes');
     var url = build_url('/ransack_advanced_plus/form_builder/'+model_name, {type: model_type, group_index: group_index, condition_index: condition_index, associations: associations});
     $.ajax({
@@ -86,7 +87,36 @@ function loadPredicates(element) {
 }
 
 function loadValues(element) {
-    console.log('carregando valores');
+    var $el = $(element);
+    var $form = getFormElement($el);
+    var model_name = $form.attr('data-rap-model');
+    var $predicateEl = getPredicateElement(element);
+    var $conditionFields = getConditionFields(element);
+    var group_index = $conditionFields.attr('data-rap-group-index');
+    var condition_index = $conditionFields.attr('data-rap-condition-index');
+    var $attributeElement = getAttributeElement(element);
+    var $valueFields = getValueFields(element);
+    var attribute = $attributeElement.val();
+    var operator = $predicateEl.val();
+    var url = build_url('/ransack_advanced_plus/values/'+model_name+'/'+attribute+'/'+operator, {group_index: group_index, condition_index: condition_index});
+    $.ajax({
+        url: url,
+        method: 'get',
+        cache: true,
+        beforeSend: function () {
+            if (localCache.exist(url)) {
+                $valueFields.html(localCache.get(url));
+                return false;
+            }
+            return true;
+        },
+        success: function(data){
+            $valueFields.html(data);
+            localCache.set(url, data);
+        },
+        error: function(error){},
+        complete: function (jqXHR, textStatus) {}
+    });
 }
 
 function removeAttributes(element) {
@@ -120,8 +150,20 @@ function getFormElement(element) {
     return $(element).closest('.ransack-form');
 }
 
+function getConditionFields(element) {
+    return $(element).closest('.ransack-condition-fields');
+}
+
+function getValueFields(element) {
+    return getConditionFields(element).find('.ransack-value-fields');
+}
+
+function getAttributeElement(element) {
+    return getConditionFields(element).find('.ransack-attribute-select');
+}
+
 function getPredicateElement(element) {
-    return $(element).closest('.ransack-condition-fields').find('.ransack-predicate-select');
+    return getConditionFields(element).find('.ransack-predicate-select');
 }
 
 $(document).on('change','.ransack-attribute-select', function(ev) {

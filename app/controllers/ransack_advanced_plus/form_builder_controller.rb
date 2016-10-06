@@ -16,7 +16,6 @@ module RansackAdvancedPlus
         locals_params.merge!({frm_condition: builder}) if type=='value'
         html = render_to_string(partial: 'ransack_advanced_plus/' + type.to_s + "_fields", locals: locals_params)
       end
-      html
       render html: html
     end
 
@@ -25,9 +24,20 @@ module RansackAdvancedPlus
       operators = rap_service.attribute_operators(params[:attribute])
       @rap_operators = {only: operators}
       rap_service.build_form_context(view_context)
-      @f = rap_service.builder_value
-      html_operators = render_to_string(partial: 'ransack_advanced_plus/predicates', locals: {frm: @f})
-      render html: html_operators
+      @f = rap_service.builder_condition
+      render html: render_to_string(partial: 'ransack_advanced_plus/predicates', locals: {frm: @f})
+    end
+
+    def values
+      rap_service = RansackAdvancedPlus::Service.new(params[:model])
+      @rap_operators = {only: [params[:operator]]}
+      rap_service.build_form_context(view_context)
+      builder = rap_service.builder_condition(params[:group_index], params[:condition_index])
+      html = nil
+      builder.send("value_fields", builder.object.send("build_value"), child_index: DateTime.now.strftime('%s')) do |ff|
+        html = render_to_string(partial: 'ransack_advanced_plus/value_fields', locals: {frm: ff, frm_condition: builder})
+      end
+      render html: html
     end
 
   end
