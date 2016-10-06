@@ -3,11 +3,10 @@ module RansackAdvancedPlus
     def index
       type = params[:type] || 'grouping'
       klass = params[:model].classify.constantize
-      associations = params[:associations].present? ? params[:associations].split(',') : nil
 
       @ransack_object = klass.send :ransack
-      @rap_associations = associations || @ransack_object.klass.ransackable_associations
       @rap_model_name = @ransack_object.context.klass.name.tableize
+      @rap_associations = params[:associations].present? ? params[:associations].split(',') : @ransack_object.klass.ransackable_associations
 
       group_index = params[:group_index]
       condition_index = params[:condition_index]
@@ -27,7 +26,6 @@ module RansackAdvancedPlus
           @f.send("grouping_fields", @f.object.send("build_grouping"), child_index: group_index){|g| @g=g}
           @g.send("condition_fields", @g.object.send("build_condition"), child_index: condition_index){|c| @c=c}
           @builder = @c
-
         end
       else
         @builder = @f

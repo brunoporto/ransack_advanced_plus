@@ -3,13 +3,10 @@ module RansackAdvancedPlusHelper
   def ransack_advanced_plus_form(object, url, *args)
 
     arguments = args.inject(:merge)
-    associations = arguments[:conditions].present? ? arguments[:conditions].keys : nil
-
     @ransack_object = object
     @ransack_object.build_grouping unless @ransack_object.groupings.any?
     @rap_model_name = @ransack_object.context.klass.name.tableize
-    @rap_associations = associations || @ransack_object.klass.ransackable_associations
-
+    @rap_associations = arguments[:associations].present? ? arguments[:associations] : @ransack_object.klass.ransackable_associations
     render partial: 'ransack_advanced_plus/advanced_search', locals: {search_url: url, redirect_path: url}
   end
 

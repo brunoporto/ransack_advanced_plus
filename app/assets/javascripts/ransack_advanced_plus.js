@@ -1,3 +1,21 @@
+
+function filter_attributes_to_show(element) {
+    var $form = $(element).closest('form[data-rap-attributes]');
+    var attributes_to_show = $form.attr('data-rap-attributes').split(',');
+    var object_name = $form.attr('data-rap-object');
+    $('select.ransack-attribute-select option').each(function(i,o) {
+        if ($.inArray($(o).val(), attributes_to_show) === -1 && $.inArray(object_name+"_"+$(o).val(), attributes_to_show) === -1) {
+            var $parent = $(o).parent();
+            if ($parent.prop("tagName")=='OPTGROUP' && $parent.children().length==1) {
+                $(o).parent().remove();
+            } else {
+                $(o).remove();
+            }
+        }
+    });
+}
+
+
 $(document).on('click','.ransack_advanced_plus_add_button',function(ev){
     ev.preventDefault();
 
@@ -6,14 +24,16 @@ $(document).on('click','.ransack_advanced_plus_add_button',function(ev){
     var model_type = $el.attr('data-model-type');
     var group_index = $el.attr('data-group-index');
     var condition_index = $el.attr('data-condition-index');
-    var associations_name = $el.closest('form').attr('data-associations');
+    var associations = $el.closest('form').attr('data-rap-associations');
+    var attributes = $el.closest('form').attr('data-rap-attributes');
 
     $.ajax({
         url: '/ransack_advanced_plus/form_builder/'+model_name,
-        data: {type: model_type, group_index: group_index, condition_index: condition_index, associations: associations_name},
+        data: {type: model_type, group_index: group_index, condition_index: condition_index, attributes: attributes, associations: associations},
         method: 'get',
         success: function(data){
             $el.before(data);
+            filter_attributes_to_show($el);
         },
         error: function(error){
 
@@ -21,6 +41,8 @@ $(document).on('click','.ransack_advanced_plus_add_button',function(ev){
     });
 
 });
+
+
 
 $(document).on('click','.ransack_advanced_plus_remove_button',function(ev){
     ev.preventDefault();
