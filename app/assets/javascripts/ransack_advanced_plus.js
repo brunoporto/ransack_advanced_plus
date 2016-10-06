@@ -95,10 +95,12 @@ function loadValues(element) {
     var group_index = $conditionFields.attr('data-rap-group-index');
     var condition_index = $conditionFields.attr('data-rap-condition-index');
     var $attributeElement = getAttributeElement(element);
+    var $valueElement = getValueElement(element);
     var $valueFields = getValueFields(element);
     var attribute = $attributeElement.val();
     var operator = $predicateEl.val();
-    var url = build_url('/ransack_advanced_plus/values/'+model_name+'/'+attribute+'/'+operator, {group_index: group_index, condition_index: condition_index});
+    var values = $valueElement.map(function(){return $(this).val();}).get().join();
+    var url = build_url('/ransack_advanced_plus/values/'+model_name+'/'+attribute+'/'+operator, {group_index: group_index, condition_index: condition_index, values: values});
     $.ajax({
         url: url,
         method: 'get',
@@ -164,6 +166,10 @@ function getAttributeElement(element) {
 
 function getPredicateElement(element) {
     return getConditionFields(element).find('.ransack-predicate-select');
+}
+
+function getValueElement(element) {
+    return getConditionFields(element).find('.ransack-value-select');
 }
 
 $(document).on('change','.ransack-attribute-select', function(ev) {

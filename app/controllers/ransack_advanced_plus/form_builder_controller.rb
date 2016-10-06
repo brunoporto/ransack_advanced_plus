@@ -33,8 +33,10 @@ module RansackAdvancedPlus
       @rap_operators = {only: [params[:operator]]}
       rap_service.build_form_context(view_context)
       builder = rap_service.builder_condition(params[:group_index], params[:condition_index])
+      values = params[:values].present? ? params[:values].split(',') : []
       html = nil
-      builder.send("value_fields", builder.object.send("build_value"), child_index: DateTime.now.strftime('%s')) do |ff|
+      build_objects = values.map{|v| builder.build_value(v)}
+      builder.send("value_fields", build_objects, child_index: DateTime.now.strftime('%s')) do |ff|
         html = render_to_string(partial: 'ransack_advanced_plus/value_fields', locals: {frm: ff, frm_condition: builder})
       end
       render html: html
