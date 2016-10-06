@@ -47,12 +47,6 @@ module RansackAdvancedPlus
       end
     end
 
-    def build_fields
-      builder.send("#{type}_fields", builder.object.send("build_#{type}"), child_index: new_id) do |ff|
-
-      end
-    end
-
     def attributes(attribute=nil)
       bases = [''] + @ransack_object.klass.ransackable_associations
       fields_type = Hash.new
@@ -75,7 +69,7 @@ module RansackAdvancedPlus
     def operators_by_type(type)
       case type.to_sym
         when :string
-          [:eq, :not_eq, :cont, :matches, :does_not_match]
+          [:eq, :not_eq, :matches, :does_not_match]
         when :integer, :float
           [:eq, :not_eq, :lt, :lteq, :gt, :gteq, :in, :not_in]
         when :date, :time, :datetime

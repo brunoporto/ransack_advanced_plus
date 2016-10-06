@@ -1,10 +1,10 @@
-<div class="fields" data-object-name="<%= frm.object_name %>">
+<div class="fields ransack-grouping-fields" data-object-name="<%= frm.object_name %>">
 
     <span>
       <%= t('ransack.advanced_search.condition_group.match') %>
       <%= frm.combinator_select({}, {class: 'form-control input-sm'}) %>
       <%= t('ransack.advanced_search.condition_group.match_condition') %>
-      <%= link_to 'Remover', nil, class: 'ransack_advanced_plus_remove_button' %>
+      <%= render 'ransack_advanced_plus/remove_button' %>
     </span>
 
     <%= frm.condition_fields do |c| %>
@@ -12,7 +12,7 @@
     <% end %>
 
     <% group_index = frm.object_name.scan(/\d+/).first %>
-    <a href="" data-rap-group-index="<%= group_index %>" data-rap-type="condition" class="ransack_advanced_plus_add_button">Adicionar Condição</a>
+    <a href="" data-rap-group-index="<%= group_index %>" data-rap-type="condition" class="ransack_advanced_plus_add_button">Condição</a>
 
     <%= frm.grouping_fields do |g| %>
         <%= render partial: 'ransack_advanced_plus/grouping_fields', locals: {frm: g} %>

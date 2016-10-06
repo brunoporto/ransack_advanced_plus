@@ -12,7 +12,9 @@ module RansackAdvancedPlus
         @rap_model_name = params[:model]
         @rap_associations = params[:associations].present? ? params[:associations].split(',') : rap_service.klass.ransackable_associations
         @rap_operators = {default: 'eq'}
-        html = render_to_string(partial: 'ransack_advanced_plus/' + type.to_s + "_fields", locals: {frm: ff})
+        locals_params = {frm: ff}
+        locals_params.merge!({frm_condition: builder}) if type=='value'
+        html = render_to_string(partial: 'ransack_advanced_plus/' + type.to_s + "_fields", locals: locals_params)
       end
       html
       render html: html

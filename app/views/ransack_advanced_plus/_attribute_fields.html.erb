@@ -1,4 +1,7 @@
 <span class="fields" data-object-name="<%= frm.object_name %>">
   <%= frm.attribute_select({associations: @rap_associations}, {class: 'ransack-attribute-select form-control input-sm'}) %>
-  <script>$('[data-object-name="<%= frm.object_name %>"] select:first').trigger('change');</script>
+  <script>
+    attribute_element = $('[data-object-name="<%= frm.object_name %>"] .ransack-attribute-select');
+    filterAttributes(attribute_element);
+  </script>
 </span>

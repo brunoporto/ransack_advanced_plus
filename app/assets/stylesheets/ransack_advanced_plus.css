@@ -1,31 +1,38 @@
-/*
- * This is a manifest file that'll be compiled into application.css, which will include all the files
- * listed below.
- *
- * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
- * or vendor/assets/stylesheets of plugins, if any, can be referenced here using a relative path.
- *
- * You're free to add application-wide styles to this file and they'll appear at the top of the
- * compiled file, but it's generally better to create a new file per style scope.
- *
- *= require_self
- *= require_tree .
- */
-
-.ransack-advanced-search i.remove_fields,
-.ransack-advanced-search i.add_fields {
-  cursor: pointer;
- }
-
- .ransack-advanced-search .ransack-condition-fields {
-     margin-bottom: 5px;
-     margin-top: 5px;
- }
-
-.ransack-advanced-search .ransack-action-buttons {
-  margin-top: 10px;
+.ransack-grouping-fields {
+    border: 1px solid #000;
+    padding: 10px;
+    margin: 10px;
 }
 
-.ransack-advanced-search .ransack-saved-search-delete {
-    margin-top: 1px;
+.ransack-condition-fields {
+    border: 1px solid #000;
+    padding: 10px;
+    margin: 10px;
+}
+
+.ransack_advanced_plus_add_button,
+.ransack_advanced_plus_remove_button {
+    cursor:pointer;
+    color: #fff;
+    border-radius: 3px;
+    background: #666;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 0px;
+    padding: 2px 5px;
+}
+
+.ransack_advanced_plus_add_button:hover,
+.ransack_advanced_plus_remove_button:hover {
+    color: #333 !important;
+    text-decoration: none;
+    background-color: #ccc;
+}
+
+.ransack_advanced_plus_add_button:before {
+    content: "+ ";
+}
+
+.ransack_advanced_plus_remove_button:before {
+    content: "×";
 }

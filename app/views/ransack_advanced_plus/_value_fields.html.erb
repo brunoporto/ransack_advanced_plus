@@ -1,1 +1,5 @@
-<%= content_tag(:span, frm.text_field(:value, {class: 'form-control input-sm ransack-value-select'}), { class: 'fields value', 'data-object-name' => frm.object_name }, false) %>
+<span class="fields value data-object-name <%= frm.object_name %>">
+  <% frm_condition.object.inspect %>
+  <% frm.object.value %>
+  <%= frm.text_field(:value, {class: 'form-control input-sm ransack-value-select'}) %>
+</span>

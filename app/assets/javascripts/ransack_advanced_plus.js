@@ -1,7 +1,107 @@
+var ransack_advanced_plus_ajax = [];
+var localCache = {
+    data: {},
+    remove: function (url) {
+        delete localCache.data[url];
+    },
+    exist: function (url) {
+        return localCache.data.hasOwnProperty(url) && localCache.data[url] !== null;
+    },
+    get: function (url) {
+        console.log('Getting in cache for url' + url);
+        return localCache.data[url];
+    },
+    set: function (url, cachedData, callback) {
+        localCache.remove(url);
+        localCache.data[url] = cachedData;
+        if ($.isFunction(callback)) callback(cachedData);
+    }
+};
+
+function loadAttributes(element) {
+    var $el = $(element);
+    var $form = getFormElement($el);
+    var model_name = $form.attr('data-rap-model');
+    var model_type = $el.attr('data-rap-type');
+    var group_index = $el.attr('data-rap-group-index');
+    var condition_index = $el.attr('data-rap-condition-index');
+    var associations = $el.closest('form').attr('data-rap-associations');
+    // var attributes = $el.closest('form').attr('data-rap-attributes');
+    var url = build_url('/ransack_advanced_plus/form_builder/'+model_name, {type: model_type, group_index: group_index, condition_index: condition_index, associations: associations});
+    $.ajax({
+        url: url,
+        method: 'get',
+        cache: true,
+        beforeSend: function () {
+            // TODO: Usar o cache para os campos não está atualizando o ID, verificar possibilidade de atualização do ID via javascript
+            // if (localCache.exist(url)) {
+            //     $el.before(localCache.get(url));
+            //     return false;
+            // }
+            // return true;
+        },
+        success: function(data){
+            $el.before(data);
+            // localCache.set(url, data);
+        },
+        error: function(error){},
+        complete: function (jqXHR, textStatus) {
+            if (model_type=='condition') {
+                filterAttributes($el);
+            }
+        }
+    });
+}
+
+function loadPredicates(element) {
+    var $el = $(element);
+    var $form = getFormElement($el);
+    var model_name = $form.attr('data-rap-model');
+    var attribute = $el.val();
+    var $predicateEl = getPredicateElement(element);
+    var current_value = $predicateEl.val();
+    if (attribute != undefined && attribute != '') {
+        var url = build_url('/ransack_advanced_plus/operators/' + model_name + '/' + attribute);
+        $.ajax({
+            url: url,
+            method: 'get',
+            cache: true,
+            beforeSend: function () {
+                if (localCache.exist(url)) {
+                    $predicateEl.html($(localCache.get(url)).html()).val(current_value);
+                    return false;
+                }
+                return true;
+            },
+            success: function (data) {
+                $predicateEl.html($(data).html()).val(current_value);
+                localCache.set(url, data);
+            },
+            error: function (error) {},
+            complete: function (jqXHR, textStatus) {}
+        });
+    } else {
+        $predicateEl.html('<option value=""></option>');
+    }
+}
+
+function loadValues(element) {
+    console.log('carregando valores');
+}
+
+function removeAttributes(element) {
+    $(element).closest('.fields').remove()
+}
+
+function build_url(url, params) {
+    if (params!=undefined) {
+        url += "?"+$.param(params);
+    }
+    return url;
+}
 
 function filterAttributes(element) {
     var $form = getFormElement(element);
-    console.log($form.attr('data-rap-attributes'));
     var attributes_to_show = $form.attr('data-rap-attributes').split(',').filter(Boolean);
     var model_name = $form.attr('data-rap-model');
     $('select.ransack-attribute-select option').each(function(i,o) {
@@ -25,143 +125,19 @@ function getPredicateElement(element) {
 }
 
 $(document).on('change','.ransack-attribute-select', function(ev) {
-    var $el = $(this);
-    var $form = getFormElement(this);
-    var model_name = $form.attr('data-rap-model');
-    var attribute = $el.val();
+    loadPredicates(this);
+});
 
-    $.ajax({
-        url: '/ransack_advanced_plus/operators/'+model_name+'/'+attribute,
-        method: 'get',
-        success: function(data){
-            var $precicateEl = getPredicateElement($el);
-            var current_value = $precicateEl.val();
-            $precicateEl.on('change',function(){
-                console.log('mudou');
-            });
-            $precicateEl.html($(data).html()).val(current_value);
-
-        },
-        error: function(error){
-
-        }
-    });
+$(document).on('change','.ransack-predicate-select', function(ev) {
+    loadValues(this);
 });
 
 $(document).on('click','.ransack_advanced_plus_add_button',function(ev){
     ev.preventDefault();
-
-    var $el = $(this);
-    var $form = getFormElement(this);
-    var model_name = $form.attr('data-rap-model');
-    var model_type = $el.attr('data-rap-type');
-    var group_index = $el.attr('data-rap-group-index');
-    var condition_index = $el.attr('data-rap-condition-index');
-    var associations = $el.closest('form').attr('data-rap-associations');
-    var attributes = $el.closest('form').attr('data-rap-attributes');
-
-    $.ajax({
-        url: '/ransack_advanced_plus/form_builder/'+model_name,
-        data: {type: model_type, group_index: group_index, condition_index: condition_index, attributes: attributes, associations: associations},
-        method: 'get',
-        success: function(data){
-            $el.before(data);
-            filterAttributes($el);
-        },
-        error: function(error){
-
-        }
-    });
-
+    loadAttributes(this);
 });
 
 $(document).on('click','.ransack_advanced_plus_remove_button',function(ev){
     ev.preventDefault();
-
-    var $el = $(this);
-    $el.closest('.fields').remove()
-
+    removeAttributes(this);
 });
-
-// $(document).ready(function(){
-//
-//     $('select.ransack-attribute-select').each(function(e) {
-//         fieldName = $(this).find('option:selected')[0].value;
-//         search.changeValueInputsType(this, fieldName, search);
-//     });
-//
-// });
-//
-// $(document).on("click", "i.add_fields", function() {
-//     search.add_fields(this, $(this).data('fieldType'), $(this).data('content'));
-//     if($(this).hasClass('ransack-add-attribute')) {
-//         fieldName = $(this).parents('.ransack-condition-fields').find('select.ransack-attribute-select').find('option:selected')[0].value;
-//         search.changeValueInputsType(this, fieldName, search);
-//     }
-//     return false;
-// });
-// $(document).on('change', 'select.ransack-attribute-select', function(e) {
-//     fieldName = $(this).find('option:selected')[0].value;
-//     search.changeValueInputsType(this, fieldName, search);
-// });
-// $(document).on("click", "i.remove_fields", function() {
-//     search.remove_fields(this);
-//     return false;
-// });
-// $(document).on("click", "button.nest_fields", function() {
-//     search.nest_fields(this, $(this).data('fieldType'));
-//     return false;
-// });
-//
-//
-//
-// (function() {
-//   this.Search = (function() {
-//     function Search(templates) {
-//       this.templates = templates != null ? templates : {};
-//     }
-//
-//     Search.prototype.remove_fields = function(button) {
-//       return $(button).closest('.fields').remove();
-//     };
-//
-//     Search.prototype.add_fields = function(button, type, content) {
-//       var new_id, regexp;
-//       new_id = new Date().getTime();
-//       regexp = new RegExp('new_' + type, 'g');
-//       return $(button).before(content.replace(regexp, new_id));
-//     };
-//
-//     Search.prototype.nest_fields = function(button, type) {
-//       var id_regexp, new_id, object_name, sanitized_object_name, template;
-//       new_id = new Date().getTime();
-//       id_regexp = new RegExp('new_' + type, 'g');
-//       template = this.templates[type];
-//       object_name = $(button).closest('.fields').attr('data-object-name');
-//       sanitized_object_name = object_name.replace(/\]\[|[^-a-zA-Z0-9:.]/g, '_').replace(/_$/, '');
-//       template = template.replace(/new_object_name\[/g, object_name + "[");
-//       template = template.replace(/new_object_name_/, sanitized_object_name + '_');
-//       return $(button).before(template.replace(id_regexp, new_id));
-//     };
-//
-//     Search.prototype.convertFieldType = function (fieldType) {
-//       var fieldTypeToHtmlType = {
-//         'default': 'text',
-//         'integer': 'number',
-//         'date' : 'date',
-//         'datetime' : 'date'
-//       };
-//       return (fieldTypeToHtmlType[fieldType] || fieldTypeToHtmlType['default']);
-//     };
-//
-//     Search.prototype.changeValueInputsType = function(element, fieldName, search) {
-//       fieldType = search.fieldsType[fieldName];
-//       conditionValueInputs = $(element).parents('.ransack-condition-fields').find('.ransack-attribute-value');
-//       conditionValueInputs.attr('type', search.convertFieldType(fieldType));
-//     };
-//
-//     return Search;
-//
-//   })();
-//
-// }).call(this);

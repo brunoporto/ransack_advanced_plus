@@ -1,1 +1,5 @@
 <%= frm.predicate_select(@rap_operators, {class: 'ransack-predicate-select form-control input-sm'}) %>
+<script>
+  attribute_element = $('[data-object-name="<%= frm.object_name %>"] .ransack-attribute-select ');
+  loadPredicates(attribute_element);
+</script>

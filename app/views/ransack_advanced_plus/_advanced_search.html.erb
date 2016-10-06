@@ -18,7 +18,7 @@
           <%= frm.grouping_fields do |g| %>
               <%= render partial: 'ransack_advanced_plus/grouping_fields', locals: {frm: g} %>
           <% end %>
-          <a href="" data-rap-type="grouping" class="ransack_advanced_plus_add_button">Adicionar Grupo</a>
+          <a href="" data-rap-type="grouping" class="ransack_advanced_plus_add_button">Grupo</a>
         </div>
 
         <!-- <%= label_tag :distinct, 'Return distinct records?' %> -->
@@ -31,6 +31,11 @@
           <%= link_to t('ransack.advanced_search.form.clear_search_text'), redirect_path, class: 'btn btn-default' %>
         </div>
       <% end %>
+
+      <fieldset>
+        <legend>DEBUG</legend>
+        <%= @ransack_object.result.to_sql %>
+      </fieldset>
     </div>
   </div>
 </div>
