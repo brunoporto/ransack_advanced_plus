@@ -1,10 +1,10 @@
 
 function filter_attributes_to_show(element) {
     var $form = $(element).closest('form[data-rap-attributes]');
-    var attributes_to_show = $form.attr('data-rap-attributes').split(',');
+    var attributes_to_show = $form.attr('data-rap-attributes').split(',').filter(Boolean);
     var object_name = $form.attr('data-rap-object');
     $('select.ransack-attribute-select option').each(function(i,o) {
-        if ($.inArray($(o).val(), attributes_to_show) === -1 && $.inArray(object_name+"_"+$(o).val(), attributes_to_show) === -1) {
+        if (attributes_to_show.length > 0 && $.inArray($(o).val(), attributes_to_show) === -1 && $.inArray(object_name+"_"+$(o).val(), attributes_to_show) === -1) {
             var $parent = $(o).parent();
             if ($parent.prop("tagName")=='OPTGROUP' && $parent.children().length==1) {
                 $(o).parent().remove();

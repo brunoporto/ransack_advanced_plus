@@ -5,8 +5,25 @@ module RansackAdvancedPlusHelper
     arguments = args.inject(:merge)
     @ransack_object = object
     @ransack_object.build_grouping unless @ransack_object.groupings.any?
-    @rap_model_name = @ransack_object.context.klass.name.tableize
-    @rap_associations = arguments[:associations].present? ? arguments[:associations] : @ransack_object.klass.ransackable_associations
+    @rap_model_name = @ransack_object.context.klass.name.tableize.singularize
+
+    @rap_associations = @ransack_object.klass.ransackable_associations
+    @rap_attributes = []
+    @rap_values = {}
+
+    if arguments.present?
+      #ASSOCIATIONS
+      if arguments[:associations].present?
+        if arguments[:associations].is_a?(Hash)
+          @rap_associations =  arguments[:associations].keys.reject{|k| @rap_model_name==k}
+          @rap_attributes = arguments[:associations].map{|k, attrs| attrs.map{|a| "#{k}_#{a}"} }
+        else
+          @rap_associations =  arguments[:associations]
+        end
+      end
+      #VALUES
+      @rap_values = arguments[:values] if arguments[:values].present? && arguments[:values].is_a?(Hash)
+    end
     render partial: 'ransack_advanced_plus/advanced_search', locals: {search_url: url, redirect_path: url}
   end
 

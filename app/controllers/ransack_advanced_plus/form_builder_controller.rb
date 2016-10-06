@@ -5,7 +5,7 @@ module RansackAdvancedPlus
       klass = params[:model].classify.constantize
 
       @ransack_object = klass.send :ransack
-      @rap_model_name = @ransack_object.context.klass.name.tableize
+      @rap_model_name = params[:model] #@ransack_object.context.klass.name.tableize
       @rap_associations = params[:associations].present? ? params[:associations].split(',') : @ransack_object.klass.ransackable_associations
 
       group_index = params[:group_index]

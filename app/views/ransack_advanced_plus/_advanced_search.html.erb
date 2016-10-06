@@ -2,7 +2,7 @@
 
   <div class="row">
     <div class="col-md-12">
-      <%= search_form_for(@ransack_object, url: search_url, html: { method: :post, class: 'form-inline', role: 'form', data: {associations: @rap_associations.join(',')}}) do |frm| %>
+      <%= search_form_for(@ransack_object, url: search_url, html: { method: :post, class: 'form-inline', role: 'form', data: {rap_attributes: @rap_attributes.join(','), rap_associations: @rap_associations.join(',')}}) do |frm| %>
 
         <div class="form-group">
           <%= label_tag 'Descrição da Busca (necessária para salvar a busca)' %>
