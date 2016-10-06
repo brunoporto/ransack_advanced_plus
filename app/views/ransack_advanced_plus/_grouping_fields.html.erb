@@ -1,4 +1,5 @@
-<div class="fields ransack-grouping-fields" data-object-name="<%= frm.object_name %>">
+<% group_index = frm.object_name.scan(/\d+/).first %>
+<div class="fields ransack-grouping-fields" data-object-name="<%= frm.object_name %>" data-rap-group-index="<%= group_index %>">
 
     <span>
       <%= t('ransack.advanced_search.condition_group.match') %>
@@ -11,8 +12,7 @@
         <%= render partial: 'ransack_advanced_plus/condition_fields', locals: {frm: c} %>
     <% end %>
 
-    <% group_index = frm.object_name.scan(/\d+/).first %>
-    <a href="" data-rap-group-index="<%= group_index %>" data-rap-type="condition" class="ransack_advanced_plus_add_button">Condição</a>
+    <a href="" data-rap-type="condition" class="ransack_advanced_plus_add_button">Condição</a>
 
     <%= frm.grouping_fields do |g| %>
         <%= render partial: 'ransack_advanced_plus/grouping_fields', locals: {frm: g} %>

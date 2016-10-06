@@ -1,4 +1,3 @@
-var ransack_advanced_plus_ajax = [];
 var localCache = {
     data: {},
     remove: function (url) {
@@ -24,7 +23,8 @@ function loadAttributes(element) {
     var model_name = $form.attr('data-rap-model');
     var associations = $form.attr('data-rap-associations');
     var $conditionFields = getConditionFields(element);
-    var group_index = $conditionFields.attr('data-rap-group-index');
+    var $groupingFields = getGroupingFields(element);
+    var group_index = $groupingFields.attr('data-rap-group-index');
     var condition_index = $conditionFields.attr('data-rap-condition-index');
     var model_type = $el.attr('data-rap-type');
     // var attributes = $el.closest('form').attr('data-rap-attributes');
@@ -107,13 +107,13 @@ function loadValues(element) {
         cache: true,
         beforeSend: function () {
             if (localCache.exist(url)) {
-                $valueFields.html(localCache.get(url));
+                $valueFields.find('.fields_content').html(localCache.get(url));
                 return false;
             }
             return true;
         },
         success: function(data){
-            $valueFields.html(data);
+            $valueFields.find('.fields_content').html(data);
             localCache.set(url, data);
         },
         error: function(error){},
@@ -150,6 +150,10 @@ function filterAttributes(element) {
 
 function getFormElement(element) {
     return $(element).closest('.ransack-form');
+}
+
+function getGroupingFields(element) {
+    return $(element).closest('.ransack-grouping-fields');
 }
 
 function getConditionFields(element) {

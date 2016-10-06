@@ -3,12 +3,11 @@ module RansackAdvancedPlus
 
     def index
       rap_service = RansackAdvancedPlus::Service.new(params[:model])
-      new_id = DateTime.now.strftime('%s')
       type = params[:type] || 'grouping'
       rap_service.build_form_context(view_context)
       builder = rap_service.builder_by_type(type, params[:group_index], params[:condition_index])
       html = nil
-      builder.send("#{type}_fields", builder.object.send("build_#{type}"), child_index: new_id) do |ff|
+      builder.send("#{type}_fields", builder.object.send("build_#{type}"), child_index: DateTime.now.strftime('%s')) do |ff|
         @rap_model_name = params[:model]
         @rap_associations = params[:associations].present? ? params[:associations].split(',') : rap_service.klass.ransackable_associations
         @rap_operators = {default: 'eq'}
@@ -34,12 +33,13 @@ module RansackAdvancedPlus
       rap_service.build_form_context(view_context)
       builder = rap_service.builder_condition(params[:group_index], params[:condition_index])
       values = params[:values].present? ? params[:values].split(',') : []
-      html = nil
-      build_objects = values.map{|v| builder.build_value(v)}
-      builder.send("value_fields", build_objects, child_index: DateTime.now.strftime('%s')) do |ff|
-        html = render_to_string(partial: 'ransack_advanced_plus/value_fields', locals: {frm: ff, frm_condition: builder})
+      html = []
+      values.each do |v|
+        builder.value_fields(builder.object.build_value(v), child_index: DateTime.now.strftime('%s')) do |ff|
+          html << render_to_string(partial: 'ransack_advanced_plus/value_fields', locals: {frm: ff, frm_condition: builder})
+        end
       end
-      render html: html
+      render html: html.join.html_safe
     end
 
   end

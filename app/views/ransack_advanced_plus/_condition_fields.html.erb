@@ -14,11 +14,12 @@
   </span>
 
   <span class="ransack-value-fields">
-    <%= frm.value_fields do |v| %>
-      <%= render partial: 'ransack_advanced_plus/value_fields', locals: {frm: v, frm_condition: frm} %>
-    <% end %>
+    <span class="fields_content">
+      <%= frm.value_fields do |v| %>
+        <%= render partial: 'ransack_advanced_plus/value_fields', locals: {frm: v, frm_condition: frm} %>
+      <% end %>
+    </span>
+    <a href="" data-rap-type="value" class="ransack_advanced_plus_add_button">Valor</a>
   </span>
-
-  <a href="" data-rap-type="value" class="ransack_advanced_plus_add_button">Valor</a>
 
 </div>
