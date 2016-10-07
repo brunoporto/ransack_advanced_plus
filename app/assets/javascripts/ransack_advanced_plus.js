@@ -52,19 +52,24 @@ function getAttribute(model_name, attribute_name) {
     return attribute;
 }
 
+function isUrl(s) {
+    var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+    return regexp.test(s);
+}
+
 function resolveValuesToArray(values) {
     return new Promise(function(resolve, reject) {
         try {
-            var url_regex = new RegExp(/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi);
             if (values == undefined || values == null) {
                 values = ''
             }
-            if (typeof values == 'string' && values.match(url_regex)) {
+            if (isUrl(values)) {
                 //VERIFICA SE É URL (CARREGAR AJAX)
                 $.ajax({
                     url: values,
                     dataType: 'json',
                     success: function (_values) {
+                        console.log(_values);
                         if (typeof _values == 'array' || typeof _values == 'object') {
                             resolveValuesToArray(_values).then(function (__values) {
                                 resolve(__values);
@@ -92,7 +97,11 @@ function setValuesElements(values, elements) {
     $(elements).each(function(i,el){
         var $el = $(el);
         var current_value = $el.val();
-        $el.html('').val('');
+        if ($el.prop("tagName")=='SELECT') {
+            $el.find('option[value!=""]').remove();
+        } else {
+            $el.val('');
+        }
         resolveValuesToArray(values).then(function(_values){
             $.each(_values, function(i, v){
                 if ($el.prop("tagName")=='SELECT' && _values.length>0) {
