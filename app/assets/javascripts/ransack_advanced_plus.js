@@ -69,7 +69,6 @@ function resolveValuesToArray(values) {
                     url: values,
                     dataType: 'json',
                     success: function (_values) {
-                        console.log(_values);
                         if (typeof _values == 'array' || typeof _values == 'object') {
                             resolveValuesToArray(_values).then(function (__values) {
                                 resolve(__values);
@@ -151,6 +150,8 @@ function loadAttributes(element, cb) {
         complete: function (jqXHR, textStatus) {
             if (model_type=='condition') {
                 filterAttributes($el);
+            } else if (model_type=='value') {
+                loadValues($el);
             }
         }
     });
