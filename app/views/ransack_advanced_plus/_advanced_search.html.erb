@@ -7,14 +7,15 @@
           document.rap_associations_dictionary = <%= @rap_associations.to_json.html_safe %>
         </script>
 
-        <div class="form-group">
-          <%= label_tag 'Descrição da Busca (necessária para salvar a busca)' %>
-          <%= text_field_tag :description, @saved_search.try(:description), class: 'form-control input-sm' %>
-          <% if @saved_search %>
-              <%= hidden_field_tag :saved_search, @saved_search.id %>
-              <%= hidden_field_tag :use_search_params, true %>
+        <% if @saved_search %>
+          <div class="form-group">
+            <%= label_tag 'Descrição da Busca (necessária para salvar a busca)' %>
+            <%= text_field_tag :description, @saved_search.try(:description), class: 'form-control input-sm' %>
+
+            <%= hidden_field_tag :saved_search, @saved_search.id %>
+            <%= hidden_field_tag :use_search_params, true %>
+          </div>
           <% end %>
-        </div>
 
         <h4><%= t('ransack.advanced_search.condition_group.title') %></h4>
         <div class="form-group">

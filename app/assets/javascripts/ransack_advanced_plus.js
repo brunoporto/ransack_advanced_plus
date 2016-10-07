@@ -54,36 +54,42 @@ function getAttribute(model_name, attribute_name) {
 
 function resolveValuesToArray(values) {
     return new Promise(function(resolve, reject) {
-        var url_regex = new RegExp(/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi);
-        if(values==undefined || values==null){ values='' }
-        if (typeof values == 'string' && values.match(url_regex)) {
-            //VERIFICA SE É URL (CARREGAR AJAX)
-            $.ajax({
-                url: values,
-                dataType: 'json',
-                success: function (_values) {
-                    resolveValuesToArray(_values).then(function (__values) {
-                        resolve(__values);
-                    });
-                },
-                error: function (error) {
-                    reject(error);
-                }
-            });
-        } else {
-            if (values[0]!=undefined) {
-                if (values[0][0] != undefined) {
-                    resolve(values);
-                } else {
-                    var new_values = [];
-                    values.each(function (i, v) {
-                        new_values.push([v, v]);
-                    });
-                    resolve(new_values);
-                }
-            } else {
-                resolve([[values, values]]);
+        try {
+            var url_regex = new RegExp(/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi);
+            if (values == undefined || values == null) {
+                values = ''
             }
+            if (typeof values == 'string' && values.match(url_regex)) {
+                //VERIFICA SE É URL (CARREGAR AJAX)
+                $.ajax({
+                    url: values,
+                    dataType: 'json',
+                    success: function (_values) {
+                        resolveValuesToArray(_values).then(function (__values) {
+                            resolve(__values);
+                        });
+                    },
+                    error: function (error) {
+                        reject(error);
+                    }
+                });
+            } else {
+                if (values[0] != undefined) {
+                    if (values[0][0] != undefined) {
+                        resolve(values);
+                    } else {
+                        var new_values = [];
+                        values.each(function (i, v) {
+                            new_values.push([v, v]);
+                        });
+                        resolve(new_values);
+                    }
+                } else {
+                    resolve([[values, values]]);
+                }
+            }
+        } catch(error) {
+            reject(error);
         }
     });
 }
@@ -91,13 +97,21 @@ function resolveValuesToArray(values) {
 function setValuesElements(values, elements) {
     $(elements).each(function(i,el){
         var $el = $(el);
+        var current_value = $el.val();
         $el.html('');
         resolveValuesToArray(values).then(function(_values){
             $.each(_values, function(i, v){
                 if ($el.prop("tagName")=='SELECT' && _values.length>0) {
                     $el.append($('<option value="'+v[1]+'">'+v[0]+'</option>'));
+                    if (current_value!='') {
+                        $el.val(current_value);
+                    }
                 } else {
-                    $el.val(v[0]);
+                    if (current_value=='') {
+                        $el.val(v[0]);
+                    } else {
+                        $el.val(current_value);
+                    }
                 }
             });
         })
@@ -271,6 +285,7 @@ function getValueElement(element) {
 }
 
 $(document).on('change','.ransack-attribute-select', function(ev) {
+    getConditionFields(this).find('.ransack-value-select').val('');
     loadPredicates(this);
 });
 
@@ -291,6 +306,7 @@ $(document).on('click','.ransack_advanced_plus_remove_button',function(ev){
 $(document).ready(function(){
     $('.ransack-attribute-select').each(function(i,o){
         filterAttributes(o);
+        loadPredicates(o);
     });
 
     //TESTE
