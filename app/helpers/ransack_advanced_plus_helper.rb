@@ -1,69 +1,56 @@
 module RansackAdvancedPlusHelper
 
   def ransack_advanced_plus_form(object, url, *args)
-
     arguments = args.inject(:merge)
     @ransack_object = object
     @ransack_object.build_grouping unless @ransack_object.groupings.any?
     @rap_model_name = @ransack_object.context.klass.name.tableize.singularize
-
-    @rap_associations = @ransack_object.klass.ransackable_associations
-    @rap_attributes = []
-    @rap_values = {}
-    @rap_operators = {default: 'eq'}
-
+    rap_service = RansackAdvancedPlus::Service.new(@rap_model_name)
     if arguments.present?
-      #ASSOCIATIONS
-      if arguments[:associations].present?
-        if arguments[:associations].is_a?(Hash)
-          @rap_associations =  arguments[:associations].keys.reject{|k| @rap_model_name==k}
-          @rap_attributes = arguments[:associations].map{|k, attrs| attrs.map{|a| "#{k}_#{a}"} }.flatten
-        else
-          @rap_associations =  arguments[:associations]
-        end
-      end
-      #VALUES
-      @rap_values = arguments[:values] if arguments[:values].present? && arguments[:values].is_a?(Hash)
+      associations = arguments[:associations]
+      @rap_values = arguments[:values]
+    else
+      associations = nil
+      @rap_values = nil
     end
+    @rap_associations = build_associations(associations)
     render partial: 'ransack_advanced_plus/advanced_search', locals: {search_url: url, redirect_path: url}
   end
 
-  # def setup_search_form(builder, search_object)
-  #   fields = builder.grouping_fields builder.object.new_grouping,
-  #     object_name: 'new_object_name', child_index: "new_grouping" do |f|
-  #     render('ransack_advanced_plus/grouping_fields', f: f)
-  #   end
-  #   %Q{
-  #     var search = new Search({grouping: "#{escape_javascript(fields)}"});
-  #     search.fieldsType = #{get_fields_data_type(search_object).to_json.html_safe}
-  #   }
-  # end
-  #
-  # def get_fields_data_type(search)
-  #   bases = [''] + search.klass.ransackable_associations
-  #   fields_type = Hash.new
-  #   bases.each do |model|
-  #     model_name = model.present? ? "#{model}_" : ""
-  #     search.context.traverse(model).columns_hash.each do |field, attributes|
-  #       fields_type["#{model_name}#{field}"] = attributes.type
-  #     end
-  #   end
-  #   fields_type
-  # end
-  #
-  # def button_to_remove_fields
-  #   content_tag :i, nil, class: 'remove_fields glyphicon glyphicon-minus-sign text-danger'
-  # end
-  #
-  # def button_to_add_fields(name, f, type, custom_class='')
-  #   new_object = f.object.send "build_#{type}"
-  #   fields = f.send("#{type}_fields", new_object, child_index: "new_#{type}") do |builder|
-  #     render('ransack_advanced_plus/' + type.to_s + "_fields", f: builder)
-  #   end
-  #   content_tag :i, name, :class => custom_class + ' add_fields glyphicon glyphicon-plus-sign text-success', :type => 'button', 'data-field-type' => type, 'data-content' => "#{fields}"
-  # end
-  #
-  # def button_to_nest_fields(name, type)
-  #   content_tag :button, name, :class => 'nest_fields', 'data-field-type' => type
-  # end
+  def build_associations(associations_by_user=nil)
+    @klass = @ransack_object.context.klass
+    associations_by_user = @klass.ransackable_associations unless associations_by_user.present?
+    new_associations = []
+    if associations_by_user.is_a?(Array)
+      associations = [''] + associations_by_user
+      associations.each do |model_name|
+        new_associations << build_attributes_from_model(model_name)
+      end
+    elsif associations_by_user.is_a?(Hash)
+      associations = associations_by_user.keys
+      associations.each do |model_name|
+        new_associations << build_attributes_from_model(model_name.to_s, associations_by_user[model_name.to_sym])
+      end
+    end
+    new_associations.flatten.inject(:merge)
+  end
+
+  def build_attributes_from_model(model_name, default_attributes={})
+    new_attributes = []
+    ransack_model_name = model_name.to_s==@rap_model_name ? '' : model_name
+    default_attributes = attribute_array_to_hash(default_attributes)
+    @ransack_object.context.traverse(ransack_model_name).columns_hash.each do |field, attributes|
+      next if default_attributes.present? && !default_attributes.key?(field.to_sym)
+      default = default_attributes.present? ? default_attributes[field.to_sym] : attributes.default
+      limit = attributes.cast_type.present? ? attributes.cast_type.limit : nil
+      type = default.is_a?(Array) || default =~ URI::regexp ? 'collection' : attributes.type
+      new_attributes << {"#{model_name}_#{field}" => {type: type, limit: limit, default: default}}
+    end
+    {"#{model_name}" => new_attributes}
+  end
+
+  def attribute_array_to_hash(attributes)
+    attributes.reduce(Hash.new){|a, h| a.merge( h.is_a?(Hash) ? {h.keys.first.to_sym => h.values.first} : {h.to_sym => nil} ) }
+  end
+
 end

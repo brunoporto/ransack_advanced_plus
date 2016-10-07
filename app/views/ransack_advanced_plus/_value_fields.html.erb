@@ -1,5 +1,22 @@
+<% attribute_type = attribute_type.present? ? attribute_type.to_sym : nil %>
+<%= attribute_type %>
+<% form_class = 'form-control input-sm ransack-value-select' %>
 <span class="fields value data-object-name <%= frm.object_name %>">
   <% frm_condition.object.inspect %>
   <% frm.object.value %>
-  <%= frm.text_field(:value, {class: 'form-control input-sm ransack-value-select'}) %>
+  <% if attribute_type==:integer %>
+    <%= frm.number_field(:value, {class: form_class}) %>
+  <% elsif attribute_type==:float %>
+  <% elsif attribute_type==:date %>
+    <%= frm.date_field(:value, {class: form_class}) %>
+  <% elsif attribute_type==:time %>
+    <%= frm.time_field(:value, {class: form_class}) %>
+  <% elsif attribute_type==:datetime %>
+    <%= frm.datetime_field(:value, {class: form_class}) %>
+  <% elsif attribute_type==:boolean %>
+  <% elsif attribute_type==:collection %>
+    <%= frm.select(:value, [], {include_blank: true}, {class: form_class}) %>
+  <% else %>
+      <%= frm.text_field(:value, {class: form_class}) %>
+  <% end %>
 </span>

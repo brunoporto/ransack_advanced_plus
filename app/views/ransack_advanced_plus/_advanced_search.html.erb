@@ -2,7 +2,10 @@
 
   <div class="row">
     <div class="col-md-12">
-      <%= search_form_for(@ransack_object, url: search_url, html: { method: :post, class: 'form-inline ransack-form', role: 'form', data: {rap_model: @rap_model_name, rap_attributes: @rap_attributes.join(','), rap_associations: @rap_associations.join(',')}}) do |frm| %>
+      <%= search_form_for(@ransack_object, url: search_url, html: { method: :post, class: 'form-inline ransack-form', role: 'form', data: {rap_model: @rap_model_name}}) do |frm| %>
+        <script>
+          document.rap_associations_dictionary = <%= @rap_associations.to_json.html_safe %>
+        </script>
 
         <div class="form-group">
           <%= label_tag 'Descrição da Busca (necessária para salvar a busca)' %>

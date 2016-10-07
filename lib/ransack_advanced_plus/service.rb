@@ -4,6 +4,7 @@ module RansackAdvancedPlus
     attr_accessor :klass, :ransack_object, :form
 
     def initialize(model)
+      @model_name = model
       @klass = model.classify.constantize
       @ransack_object = @klass.send :ransack
       @form = nil
@@ -48,7 +49,7 @@ module RansackAdvancedPlus
     end
 
     def attributes(attribute=nil)
-      bases = [''] + @ransack_object.klass.ransackable_associations
+      bases = [''] + @klass.ransackable_associations
       fields_type = Hash.new
       bases.each do |model|
         model_name = model.present? ? "#{model}_" : ""
@@ -61,8 +62,33 @@ module RansackAdvancedPlus
       fields_type
     end
 
+    def attribute_type(attribute)
+      if attribute_is_collection?(attribute)
+        :collection
+      else
+        attributes(attribute).values.first
+      end
+    end
+
     def attribute_operators(attribute)
-      operators_by_type(attributes(attribute).values.first)
+      operators_by_type(attribute_type(attribute))
+    end
+
+    def association_klass_from_attribute(attribute)
+      klass = nil
+      attribute_name = nil
+      @klass.ransackable_associations.each do |association|
+        if attribute =~ /^#{association}_/
+          klass = association.classify.constantize
+          attribute_name = attribute.gsub("#{association}_",'')
+        end
+      end
+      return klass, attribute_name
+    end
+
+    def attribute_is_collection?(attribute)
+      association_klass, attribute_name = association_klass_from_attribute(attribute)
+      (association_klass && association_klass.respond_to?("#{attribute_name}_collection"))
     end
 
     def operators_by_type(type)
@@ -80,5 +106,34 @@ module RansackAdvancedPlus
       end
     end
 
+    def filter_associations(associations_by_user=nil)
+      if associations_by_user.present?
+        if associations_by_user.is_a?(Hash)
+          associations_by_user.keys.reject{|m| @model_name==m}
+        else
+          associations_by_user
+        end
+      else
+        @klass.ransackable_associations
+      end
+    end
+
+    def filter_attributes(associations_by_user=nil)
+      attributes = []
+      if associations_by_user.present?
+        associations_by_user.map do |m, attrs|
+          attrs.map do |a|
+            attributes << {"#{m.to_s}_#{(a.is_a?(Hash) ? a.keys.first : a)}" => (a.is_a?(Hash) ? a.values.first : nil)}
+          end
+        end
+      end
+      attributes.flatten.inject(:merge)
+    end
   end
+
+
+
+
+
+
 end
