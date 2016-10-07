@@ -65,28 +65,22 @@ function resolveValuesToArray(values) {
                     url: values,
                     dataType: 'json',
                     success: function (_values) {
-                        resolveValuesToArray(_values).then(function (__values) {
-                            resolve(__values);
-                        });
+                        if (typeof _values == 'array' || typeof _values == 'object') {
+                            resolveValuesToArray(_values).then(function (__values) {
+                                resolve(__values);
+                            });
+                        } else {
+                            reject(__values);
+                        }
                     },
                     error: function (error) {
                         reject(error);
                     }
                 });
+            } else if (values[0] != undefined && values[0][0] != undefined) {
+                resolve(values);
             } else {
-                if (values[0] != undefined) {
-                    if (values[0][0] != undefined) {
-                        resolve(values);
-                    } else {
-                        var new_values = [];
-                        values.each(function (i, v) {
-                            new_values.push([v, v]);
-                        });
-                        resolve(new_values);
-                    }
-                } else {
-                    resolve([[values, values]]);
-                }
+                resolve([[values, values]]);
             }
         } catch(error) {
             reject(error);
@@ -98,14 +92,12 @@ function setValuesElements(values, elements) {
     $(elements).each(function(i,el){
         var $el = $(el);
         var current_value = $el.val();
-        $el.html('');
+        $el.html('').val('');
         resolveValuesToArray(values).then(function(_values){
             $.each(_values, function(i, v){
                 if ($el.prop("tagName")=='SELECT' && _values.length>0) {
                     $el.append($('<option value="'+v[1]+'">'+v[0]+'</option>'));
-                    if (current_value!='') {
-                        $el.val(current_value);
-                    }
+                    if (current_value!='') {$el.val(current_value);}
                 } else {
                     if (current_value=='') {
                         $el.val(v[0]);
