@@ -8,10 +8,8 @@ module RansackAdvancedPlusHelper
     rap_service = RansackAdvancedPlus::Service.new(@rap_model_name)
     if arguments.present?
       associations = arguments[:associations]
-      @rap_values = arguments[:values]
     else
       associations = nil
-      @rap_values = nil
     end
     @rap_operators = {default: :eq}
     @rap_associations = rap_service.build_associations(associations)

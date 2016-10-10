@@ -33,11 +33,11 @@ module RansackAdvancedPlus
       @rap_operador = params[:operator]
       builder = rap_service.builder_condition(params[:group_index], params[:condition_index])
       values = params[:values].present? ? params[:values].split(',') : ['']
-      attribute_type = params[:type].present? ? params[:type] : rap_service.attribute_type(params[:attribute])
+      @attribute_type = params[:type].present? ? params[:type] : rap_service.attribute_type(params[:attribute])
       html = []
       values.each do |v|
         builder.value_fields(builder.object.build_value(v), child_index: DateTime.now.strftime('%s')) do |ff|
-          html << render_to_string(partial: 'ransack_advanced_plus/value_fields', locals: {frm: ff, frm_condition: builder, attribute_type: attribute_type, current_value: v})
+          html << render_to_string(partial: 'ransack_advanced_plus/value_fields', locals: {frm: ff, frm_condition: builder, current_value: v})
         end
       end
       render html: html.join.html_safe
